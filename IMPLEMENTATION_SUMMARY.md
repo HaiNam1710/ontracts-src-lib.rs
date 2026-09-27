@@ -1,5 +1,36 @@
 # GitHub Webhook Secret Validation - Implementation Summary
 
+
+## Table of Contents
+
+- [Quick Overview](#quick-overview)
+- [File Structure](#file-structure)
+- [Code Changes](#code-changes)
+  - [1. New Validation Module](#1-new-validation-module)
+  - [2. Startup Integration](#2-startup-integration)
+  - [3. Environment Documentation](#3-environment-documentation)
+  - [4. Comprehensive Tests](#4-comprehensive-tests)
+- [How It Works](#how-it-works)
+  - [Scenario 1: Production with Missing Secret](#scenario-1-production-with-missing-secret)
+  - [Scenario 2: Development with Missing Secret](#scenario-2-development-with-missing-secret)
+  - [Scenario 3: Production with Secret Configured](#scenario-3-production-with-secret-configured)
+- [Integration with Webhook Verification](#integration-with-webhook-verification)
+- [Deployment Guide](#deployment-guide)
+  - [Local Development](#local-development)
+  - [Production Deployment](#production-deployment)
+- [Security Best Practices](#security-best-practices)
+- [Troubleshooting](#troubleshooting)
+- [Testing](#testing)
+  - [Worked Example: Running Webhook Secret Validation Tests Locally](#worked-example-running-webhook-secret-validation-tests-locally)
+- [Acceptance Criteria](#acceptance-criteria)
+- [Files Changed](#files-changed)
+- [Next Steps](#next-steps)
+- [See Also / Related Documentation](#see-also--related-documentation)
+- [References](#references)
+
+---
+
+
 ## Quick Overview
 
 This implementation adds startup validation for `GITHUB_WEBHOOK_SECRET` to prevent unauthorized webhook events. The solution is production-safe, development-friendly, and fully tested.
@@ -341,6 +372,16 @@ This worked example demonstrates how to execute the test suite for `validateGitH
 3. Set up alerts for webhook failures
 4. Document secret rotation procedure for team
 5. Consider adding webhook signature verification to other providers (if applicable)
+
+
+## See Also / Related Documentation
+
+- [WEBHOOK_SECRET_VALIDATION.md](./WEBHOOK_SECRET_VALIDATION.md) — Complete specification and design rationale for webhook secret validation.
+- [WEBHOOK_SECURITY_GUIDE.md](./WEBHOOK_SECURITY_GUIDE.md) — Webhook security guide covering HMAC verification architecture and simulation.
+- [CODE_EXAMPLES.md](./CODE_EXAMPLES.md) — Implementation code examples, test setups, and deployment scripts.
+- [SECURITY.md](./SECURITY.md) — Root security policies, supported versions, and vulnerability reporting.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contributor checklist, testing guidelines, and conventional commits.
+
 
 ## References
 
