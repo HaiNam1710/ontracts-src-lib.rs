@@ -130,7 +130,36 @@ Routes:
     }
     ```
   - **Error Responses**: Rate limit exceeded returns HTTP `429 Too Many Requests` (via global rate limiter).
-- `GET /api/health/deep` — dependency-aware readiness check (returns 503 if any component is down)
+- `GET /api/health/deep` — dependency-aware readiness check
+  - **Request**: No request body or query parameters required.
+  - **Response 200 OK** (all components healthy):
+    ```json
+    {
+      "overall": "up",
+      "components": {
+        "store": "up",
+        "soroban": "up",
+        "contract": "up",
+        "auth": "up"
+      },
+      "timestamp": "2026-09-28T01:00:00.000Z"
+    }
+    ```
+  - **Response 503 Service Unavailable** (one or more components degraded):
+    ```json
+    {
+      "overall": "down",
+      "components": {
+        "store": "down",
+        "soroban": "up",
+        "contract": "up",
+        "auth": "up"
+      },
+      "timestamp": "2026-09-28T01:00:00.000Z"
+    }
+    ```
+  - **Error Responses**:
+    - `429 Too Many Requests` — rate limit exceeded.
 - `GET /api/bounties` — list and filter bounties
   - **Query Parameters**:
     - `q` (optional): Free-text search keyword.
