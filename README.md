@@ -119,7 +119,17 @@ Base URL:
 
 Routes:
 
-- `GET /api/health`
+- `GET /api/health` — liveness check
+  - **Request**: No request body or query parameters required.
+  - **Response 200 OK**:
+    ```json
+    {
+      "service": "stellar-bounty-board-api",
+      "status": "ok",
+      "timestamp": "2026-09-27T15:30:00.000Z"
+    }
+    ```
+  - **Error Responses**: Rate limit exceeded returns HTTP `429 Too Many Requests` (via global rate limiter).
 - `GET /api/health/deep` — dependency-aware readiness check (returns 503 if any component is down)
 - `GET /api/bounties`
 - `POST /api/bounties`
