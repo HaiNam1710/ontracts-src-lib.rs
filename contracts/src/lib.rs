@@ -941,6 +941,30 @@ impl StellarBountyBoardContract {
         );
     }
 
+    /// Retrieves the current state of a bounty by its unique identifier.
+    ///
+    /// This function is part of the public contract ABI. If the bounty's deadline
+    /// has elapsed and its status is either [`BountyStatus::Open`] or [`BountyStatus::Reserved`],
+    /// the returned in-memory status is updated to [`BountyStatus::Expired`] via `expire_if_needed`.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty to retrieve.
+    ///
+    /// # Returns
+    /// * [`Bounty`] - The requested bounty struct with lazily-evaluated expiration.
+    ///
+    /// # Authorisation
+    /// * None (public view query; no caller authentication or signatures required).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (raised in `read_bounty`).
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the bounty state from persistent storage via `read_bounty`.
+    /// * **Write**:
+    ///   - None (read-only query; expiration status mutation is purely in-memory).
     pub fn get_bounty(env: Env, bounty_id: u64) -> Bounty {
         let mut bounty = read_bounty(&env, bounty_id);
         expire_if_needed(&env, &mut bounty);
