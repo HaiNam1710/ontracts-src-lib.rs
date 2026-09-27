@@ -26,6 +26,7 @@
 - [Quick Reference](#quick-reference)
 - [See Also / Related Documentation](#see-also--related-documentation)
 - [Additional Resources](#additional-resources)
+- [Wave & Backlog Alignment](#wave--backlog-alignment)
 - [Support](#support)
 
 ---
@@ -511,6 +512,29 @@ npm run test:coverage
 - [HMAC-SHA256 Verification](https://en.wikipedia.org/wiki/HMAC)
 - [12 Factor App - Configuration](https://12factor.net/config)
 - [OWASP - Secrets Management](https://cheatsheetseries.owasp.org/cheatsheets/Secrets_Management_Cheat_Sheet.html)
+
+
+## Wave & Backlog Alignment
+
+This security guide is integrated with the project's phased delivery roadmap across waves 4, 5, and 6:
+
+- **Wave 4 ([docs/wave-4.md](docs/wave-4.md)) — Core Foundation & Schema Hardening:**
+  - Implements API input validation and automated contract verification.
+  - Aligns with GitHub PR webhook handlers for status transitions.
+- **Wave 5 ([docs/wave-5.md](docs/wave-5.md)) — Security, Observability & Polish:**
+  - Enforces `GITHUB_WEBHOOK_SECRET` validation on server startup (`WEBHOOK_SECRET_VALIDATION.md`).
+  - Implements structured security audit logging and timing-safe signature verification.
+- **Wave 6 ([docs/wave-6.md](docs/wave-6.md)) — Production Hardening & Integration:**
+  - Automated webhook synchronization with persistent audit storage.
+  - Secret rotation runbooks and multi-environment deployment gating.
+
+### Canonical Contribution Process
+
+When contributing webhook or security enhancements, follow the canonical workflow defined in [CONTRIBUTING.md](./CONTRIBUTING.md):
+1. **Branching**: Create focused topic branches off `main` (e.g. `feat/webhook-...`, `fix/security-...`).
+2. **Conventional Commits**: Format commit messages according to the repository standard (`feat(...)`, `fix(...)`, `docs(...)`).
+3. **Local Testing**: Run `npm test` and pre-commit checks via Husky and lint-staged before opening a PR.
+4. **Issue Linkage**: Reference the associated issue in your PR description (`Closes #<issue-id>`).
 
 ## Support
 
