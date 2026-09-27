@@ -30,6 +30,41 @@ Once no violations are observed in staging, the meta tag should be upgraded to
 Edit the `cspDirectives` array in `frontend/vite.config.ts` → `cspPlugin()`.
 After any change, verify there are no new console violations before promoting to production.
 
+### Worked Example: Verifying CSP Report-Only Mode Locally
+
+Before deploying changes to `cspDirectives` in `frontend/vite.config.ts`, verify that violations are captured in report-only mode without blocking resources.
+
+1. **Start the frontend application:**
+   ```bash
+   cd frontend
+   npm run dev
+   ```
+   *Expected output:*
+   ```text
+     VITE v5.4.2  ready in 320 ms
+
+     ➜  Local:   http://localhost:5173/
+     ➜  Network: use --host to expose
+   ```
+
+2. **Inspect the rendered meta tag using curl:**
+   ```bash
+   curl -s http://localhost:5173/ | grep -i "content-security-policy"
+   ```
+   *Expected output:*
+   ```html
+   <meta http-equiv="Content-Security-Policy-Report-Only" content="default-src 'self'; connect-src 'self' https://rpc-futurenet.stellar.org https://api.github.com; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'self';">
+   ```
+
+3. **Verify console behavior:**
+   - Open Chrome DevTools (`F12`) -> Navigate to **Console**.
+   - If an unauthorized script/image is evaluated, the browser outputs:
+     ```text
+     [Report Only] Refused to load the script 'https://untrusted-cdn.example.com/analytics.js' because it violates the following Content Security Policy directive: "script-src 'self'".
+     ```
+   - Notice that the script is flagged for audit without breaking the user experience.
+
+
 ---
 
 ## Supported Versions
