@@ -446,6 +446,54 @@ impl StellarBountyBoardContract {
             .unwrap_or(false)
     }
 
+    /// Creates and escrows funds for a new bounty.
+    ///
+    /// This function is part of the public contract ABI. A maintainer locks funds
+    /// into contract escrow, configuring bounty metadata, payout amounts, deadlines,
+    /// protocol fees, and optional dispute resolution parameters.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `maintainer` - Address of the maintainer creating and funding the bounty.
+    /// * `token` - Address of the accepted token used for payout and escrow.
+    /// * `amount` - Amount of tokens escrowed for the bounty (`i128`).
+    /// * `repo` - Repository identifier string (e.g., owner/repo).
+    /// * `issue_number` - Issue number on the host repository (`u32`).
+    /// * `title` - Title or descriptive summary of the bounty.
+    /// * `deadline` - Ledger timestamp (`u64`) after which the bounty can be refunded.
+    /// * `protocol_fee_bps` - Protocol fee in basis points (`u32`, 100 bps = 1%, max 10000).
+    /// * `dispute_window_override` - Optional custom dispute window duration in seconds (`Option<u64>`).
+    ///
+    /// # Returns
+    /// * `u64` - The unique ID assigned to the newly created bounty.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from the creating `maintainer` (`maintainer.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::ContractIsPaused`] - If the contract circuit-breaker is paused (`Self::get_paused_state`).
+    /// * [`ContractError::InvalidAmount`] - If `amount <= 0` or exceeds `MAX_BOUNTY_AMOUNT`.
+    /// * [`ContractError::AmountTooSmall`] - If `amount` is below the configured `min_bounty_amount`.
+    /// * [`ContractError::DeadlineMustBeInTheFuture`] - If `deadline` is less than or equal to current ledger timestamp.
+    /// * Panic (`fee exceeds 100%`) - If `protocol_fee_bps > 10_000`.
+    /// * [`ContractError::FeeRecipientNotSet`] - If `protocol_fee_bps > 0` but no fee recipient is configured in storage.
+    /// * [`ContractError::TokenNotAllowed`] - If `token` is not in the allowed token whitelist.
+    /// * [`ContractError::DisputeWindowOverrideTooSmall`] - If `dispute_window_override` is provided and `< MIN_DISPUTE_WINDOW_OVERRIDE`.
+    /// * [`ContractError::DisputeWindowOverrideTooLarge`] - If `dispute_window_override` is provided and `> MAX_DISPUTE_WINDOW_OVERRIDE`.
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Paused`] - Verified via `get_paused_state`.
+    ///   - [`DataKey::MinBountyAmount`] - Checked via `get_min_bounty_amount`.
+    ///   - [`DataKey::FeeRecipient`] - Checked when `protocol_fee_bps > 0`.
+    ///   - [`DataKey::AllowedTokens`] - Checked to ensure `token` is whitelisted.
+    ///   - [`DataKey::NextBountyId`] - Read to determine the next available bounty ID.
+    /// * **Write**:
+    ///   - [`DataKey::NextBountyId`] - Incremented and updated with the new ID counter.
+    ///   - [`DataKey::Bounty(next_id)`] - Persists the newly created [`Bounty`] with status [`BountyStatus::Open`].
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Create"))` with [`BountyCreated`] payload.
     pub fn create_bounty(
         env: Env,
         maintainer: Address,
