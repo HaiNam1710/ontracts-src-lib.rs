@@ -158,9 +158,9 @@ The Stellar Bounty Board contract (`contracts/src/lib.rs`) currently places **si
 
 3. **No Time Constraints on Resolution**: While there is a dispute window that must pass before resolution, once the window expires, the arbiter can resolve at any time without additional constraints.
 
-4. **Single Point of Control**: The arbiter address is set once during contract initialization and cannot be changed without redeploying the entire contract.
+4. **Timelocked Rotation**: The arbiter address is rotatable through `set_arbiter` / `confirm_arbiter`, which require the admin's authorization and a two-day timelock, so a rotation cannot be smuggled through unnoticed.
 
-5. **No Oversight Mechanisms**: There are no committee voting, multi-signature requirements, or slashing/bonding mechanisms to constrain arbiter behavior.
+5. **Bonded Arbiter, No Committee**: There is no committee voting and no multi-signature requirement. Since the arbiter-bond change, the role is bonded instead: a candidate must post at least `MinArbiterStake` in a single token via `bond_arbiter_stake` before `set_arbiter` will accept them, the tokens are escrowed in the contract, and the admin can forfeit part of the bond to the treasury with `slash_arbiter` when a ruling was bad. A bond gives a bad ruling a price and caps the damage an arbiter can do; it does not add a second level of review, so the ruling itself remains final.
 
 ### Failure Modes
 
