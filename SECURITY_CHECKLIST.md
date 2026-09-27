@@ -29,3 +29,43 @@ Check that a documented, tested admin API key rotation procedure is established,
 - **Exercise Evidence:** Require concrete evidence (such as test output or execution logs) demonstrating that the rotation procedure was actually exercised and that a rotated-out key is confirmed rejected, rather than merely documented.
 **Relevant Files:** Authentication services, API key management handlers, route controllers, security documentation.
 
+### Worked Example: Exercising Admin API Key Rotation and Verification
+
+When performing an Admin API Key rotation, follow this procedure with concrete curl verification commands:
+
+1. **Generate and activate the replacement admin API key in `.env`:**
+   ```bash
+   # Generate secure 256-bit token
+   openssl rand -hex 32
+   ```
+   *Expected output:*
+   ```text
+   7f8a9b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcd
+   ```
+
+2. **Verify authentication with the new key:**
+   ```bash
+   curl -s -o /dev/null -w "%{http_code}" \
+     -H "Authorization: Bearer 7f8a9b2c3d4e5f60718293a4b5c6d7e8f90123456789abcdef0123456789abcd" \
+     http://localhost:3000/api/admin/health
+   ```
+   *Expected output:*
+   ```text
+   200
+   ```
+
+3. **Verify rejection and revocation of the retired/previous key:**
+   ```bash
+   curl -s -i \
+     -H "Authorization: Bearer old_revoked_key_here" \
+     http://localhost:3000/api/admin/health
+   ```
+   *Expected output:*
+   ```http
+   HTTP/1.1 401 Unauthorized
+   Content-Type: application/json; charset=utf-8
+
+   {"error":"Unauthorized","message":"Invalid or revoked API credentials"}
+   ```
+
+
