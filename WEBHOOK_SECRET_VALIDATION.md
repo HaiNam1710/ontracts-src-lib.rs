@@ -45,6 +45,40 @@ app.listen(port, () => {
 });
 ```
 
+### Complete Worked Example: Validating Webhook Secret at Startup
+
+This worked walkthrough illustrates both failure and success cases during application startup when validating `GITHUB_WEBHOOK_SECRET`.
+
+#### 1. Negative Case: Starting in Production without Secret (Fast-fail)
+```bash
+# Clear secret and attempt startup in production mode
+unset GITHUB_WEBHOOK_SECRET
+export NODE_ENV=production
+npm start
+```
+
+*Expected output & exit code 1:*
+```text
+{"level":"error","event":"startup_validation_failed","reason":"missing_github_webhook_secret","environment":"production","timestamp":"2026-09-28T02:00:00.000Z"}
+Error: GITHUB_WEBHOOK_SECRET environment variable is not configured. This is required to verify GitHub webhook signatures and prevent unauthorized webhook events. Set GITHUB_WEBHOOK_SECRET to a secure random string (e.g., openssl rand -hex 20).
+```
+
+#### 2. Positive Case: Supplying Cryptographic Secret and Starting Successfully
+```bash
+# Generate high-entropy 40-character hex secret
+export GITHUB_WEBHOOK_SECRET=$(openssl rand -hex 20)
+export NODE_ENV=production
+export PORT=3001
+npm start
+```
+
+*Expected output:*
+```text
+{"level":"info","event":"startup_validation_passed","environment":"production","timestamp":"2026-09-28T02:00:01.000Z"}
+{"level":"info","event":"server_listen","port":3001,"timestamp":"2026-09-28T02:00:01.120Z"}
+```
+
+
 **Key Points:**
 - Validation runs **before** any routes or middleware are initialized
 - Fails fast with a clear error message
