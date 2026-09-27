@@ -12,6 +12,7 @@ This checklist is based on OWASP Top 10 inspired principles. When making a pull 
 - [5. Secret Handling](#5-secret-handling)
 - [6. Admin API Key Rotation Procedure](#6-admin-api-key-rotation-procedure)
   - [Worked Example: Exercising Admin API Key Rotation and Verification](#worked-example-exercising-admin-api-key-rotation-and-verification)
+- [Wave & Backlog Alignment](#wave--backlog-alignment)
 - [See Also / Related Documentation](#see-also--related-documentation)
 
 ---
@@ -85,6 +86,26 @@ When performing an Admin API Key rotation, follow this procedure with concrete c
 
 
 ---
+
+
+## Wave & Backlog Alignment
+
+This security checklist serves as the quality gate across all delivery milestones in waves 4, 5, and 6:
+
+- **Wave 4 ([docs/wave-4.md](docs/wave-4.md)) — Core API & Contract Foundation:**
+  - Enforces Item 1 (Input Validation Changed) and Item 2 (Auth Modified) on all bounty lifecycle endpoints (`/reserve`, `/submit`, `/release`, `/refund`).
+- **Wave 5 ([docs/wave-5.md](docs/wave-5.md)) — Security, Observability & Polish:**
+  - Enforces Item 5 (Secret Handling) and Item 6 (Admin API Key Rotation Procedure) with verified rejection proof.
+- **Wave 6 ([docs/wave-6.md](docs/wave-6.md)) — Production Hardening & Integration:**
+  - Governs external fetch auditing (Item 3) and dependency additions (Item 4) prior to production database migration and Freighter wallet auth.
+
+### Canonical Contribution Process
+
+All pull requests modifying security-sensitive code must follow the single canonical process in [CONTRIBUTING.md](./CONTRIBUTING.md):
+1. **Branch Hygiene**: Create dedicated topic branches off `main`.
+2. **Review Checklist**: Review all 6 checklist items above before submitting your pull request.
+3. **Evidence Requirement**: Include explicit test commands and output logs demonstrating both success and rejection behaviors.
+
 
 ## See Also / Related Documentation
 
