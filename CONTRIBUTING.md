@@ -136,6 +136,55 @@ Before submitting a PR, verify:
   - How to test/verify the change
   - Link to related issue(s): `Closes #<issue-number>`
 
+### Complete Worked Example: From Branch Creation to Verified Pull Request
+
+Here is a step-by-step worked session showing how a contributor picks up an issue, verifies tests locally, and creates a compliant Conventional Commit:
+
+1. **Create and switch to a topic branch:**
+   ```bash
+   git checkout main
+   git pull origin main
+   git checkout -b fix/issue-42-reject-negative-bounty
+   ```
+   *Expected output:*
+   ```text
+   Switched to a new branch 'fix/issue-42-reject-negative-bounty'
+   ```
+
+2. **Run test suite before making changes:**
+   ```bash
+   npm test
+   ```
+   *Expected output:*
+   ```text
+   Test Files  18 passed (18)
+   Tests       142 passed (142)
+   ```
+
+3. **Stage modifications and run pre-commit checks:**
+   ```bash
+   git add backend/src/controllers/bounties.ts backend/test/bounties.test.ts
+   git commit -m "fix(backend): reject negative bounty amounts (#42)"
+   ```
+   *Expected output from Husky / lint-staged:*
+   ```text
+   ✔ Preparing lint-staged...
+   ✔ Running tasks for staged files...
+     ❯ Running type-check...
+     ❯ Running eslint --fix...
+     ❯ Running prettier --write...
+   ✔ Applying modifications...
+   ✔ Cleaning up temporary files...
+   [fix/issue-42-reject-negative-bounty a1b2c3d] fix(backend): reject negative bounty amounts (#42)
+    2 files changed, 14 insertions(+), 2 deletions(-)
+   ```
+
+4. **Push branch and open Pull Request:**
+   ```bash
+   git push origin fix/issue-42-reject-negative-bounty
+   ```
+
+
 ## Testing
 
 This project uses Vitest for testing. Tests are organized by type and located in `backend/test/` and `frontend/src/`.
