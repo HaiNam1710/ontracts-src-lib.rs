@@ -21,6 +21,7 @@
 - [Files Modified](#files-modified)
 - [Acceptance Criteria Met](#acceptance-criteria-met)
 - [See Also / Related Documentation](#see-also--related-documentation)
+- [Wave & Backlog Alignment](#wave--backlog-alignment)
 - [References](#references)
 
 ---
@@ -337,6 +338,27 @@ Tests  13 passed (13)
 - [SECURITY.md](./SECURITY.md) — Main repository security policy and vulnerability disclosure procedures.
 - [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) — Pre-PR security verification checklist for new routes, secrets, and auth changes.
 - [CONTRIBUTING.md](./CONTRIBUTING.md) — Development workflow, testing standards, and pull request procedures.
+
+
+
+## Wave & Backlog Alignment
+
+This validation module directly fulfills milestone requirements defined in the repository's phased delivery roadmap across waves 4, 5, and 6:
+
+- **Wave 4 ([docs/wave-4.md](docs/wave-4.md)) — Core Foundation & Endpoints:**
+  - Standardizes backend startup routines and input validation patterns across all API controllers.
+- **Wave 5 ([docs/wave-5.md](docs/wave-5.md)) — Security, Observability & Polish:**
+  - Implements fast-fail startup validation for `GITHUB_WEBHOOK_SECRET` (addressing security issue #346).
+  - Emits machine-readable structured logs (`startup_validation_failed`, `startup_validation_warning`) for telemetry.
+- **Wave 6 ([docs/wave-6.md](docs/wave-6.md)) — Production Hardening & Integration:**
+  - Automated deployment checks and credential lifecycle management ensuring production instances refuse startup without configured webhook verification secrets.
+
+### Canonical Contribution Process
+
+All updates to secret validation logic and associated tests must adhere to the single canonical contribution workflow documented in [CONTRIBUTING.md](./CONTRIBUTING.md):
+1. **Branching**: Branch off `main` using standard prefixes (`fix/`, `feat/`, `docs/`).
+2. **Commit Standard**: Follow [Conventional Commits](https://www.conventionalcommits.org/) (`feat(validation): ...`, `test(validation): ...`).
+3. **Automated Verification**: Ensure all 13 unit tests pass (`npm test -- webhookSecretValidation.test.ts`) and Husky pre-commit hooks pass cleanly.
 
 
 ## References
