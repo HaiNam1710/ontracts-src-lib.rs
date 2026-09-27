@@ -2,6 +2,21 @@
 
 This checklist is based on OWASP Top 10 inspired principles. When making a pull request, review the following items and ensure relevant files have been verified.
 
+
+## Table of Contents
+
+- [1. Input Validation Changed](#1-input-validation-changed)
+- [2. Auth Modified](#2-auth-modified)
+- [3. New External Fetch](#3-new-external-fetch)
+- [4. Dependency Added](#4-dependency-added)
+- [5. Secret Handling](#5-secret-handling)
+- [6. Admin API Key Rotation Procedure](#6-admin-api-key-rotation-procedure)
+  - [Worked Example: Exercising Admin API Key Rotation and Verification](#worked-example-exercising-admin-api-key-rotation-and-verification)
+- [See Also / Related Documentation](#see-also--related-documentation)
+
+---
+
+
 ## 1. Input Validation Changed
 Check for proper validation, sanitization, and typing of all inputs from users or external systems.
 **Relevant Files:** Route handlers, controllers, data transfer objects (DTOs), API layer.
@@ -68,4 +83,13 @@ When performing an Admin API Key rotation, follow this procedure with concrete c
    {"error":"Unauthorized","message":"Invalid or revoked API credentials"}
    ```
 
+
+---
+
+## See Also / Related Documentation
+
+- [SECURITY.md](./SECURITY.md) — Comprehensive Security Policy, reporting instructions, and CSP configurations.
+- [WEBHOOK_SECURITY_GUIDE.md](./WEBHOOK_SECURITY_GUIDE.md) — Webhook signature verification and threat mitigation guide.
+- [WEBHOOK_SECRET_VALIDATION.md](./WEBHOOK_SECRET_VALIDATION.md) — Environment variable startup validation and secret management.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contributor checklist, conventional commits, and local test requirements.
 
