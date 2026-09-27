@@ -545,6 +545,33 @@ impl StellarBountyBoardContract {
         next_id
     }
 
+    /// Reserves an open bounty for a specific contributor.
+    ///
+    /// This function is part of the public contract ABI. A contributor claims the
+    /// exclusive right to work on an open bounty before submitting a solution.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty to reserve.
+    /// * `contributor` - Address of the contributor reserving the bounty.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from the reserving `contributor` (`contributor.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::ContractIsPaused`] - If the contract circuit-breaker is paused (`Self::get_paused_state`).
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (raised in `read_bounty`).
+    /// * [`ContractError::BountyNotOpen`] - If the bounty's status is not [`BountyStatus::Open`] or has expired past deadline.
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Paused`] - Checked to verify active circuit-breaker state.
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the existing bounty state via `read_bounty`.
+    /// * **Write**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Assigns `bounty.contributor` and transitions status to [`BountyStatus::Reserved`] via `write_bounty`.
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Reserv"))` with [`BountyReserved`] payload.
     pub fn reserve_bounty(env: Env, bounty_id: u64, contributor: Address) {
         contributor.require_auth();
 
