@@ -1,5 +1,36 @@
 # GitHub Webhook Security Implementation Guide
 
+
+## Table of Contents
+
+- [Executive Summary](#executive-summary)
+- [Security Architecture](#security-architecture)
+- [Environment Configuration](#environment-configuration)
+  - [Production Environment](#production-environment)
+  - [Development Environment](#development-environment)
+- [Secret Generation and Management](#secret-generation-and-management)
+  - [Generating a Secure Secret](#generating-a-secure-secret)
+  - [Storing the Secret](#storing-the-secret)
+  - [Rotating the Secret](#rotating-the-secret)
+- [Webhook Verification Flow](#webhook-verification-flow)
+  - [Valid Webhook Request](#valid-webhook-request)
+  - [Invalid Webhook Request (Attacker)](#invalid-webhook-request-attacker)
+- [Error Scenarios and Solutions](#error-scenarios-and-solutions)
+- [Testing Webhook Signatures](#testing-webhook-signatures)
+  - [Manual Testing with curl](#manual-testing-with-curl)
+  - [Complete Worked Example: End-to-End Delivery Simulation & Verification](#complete-worked-example-end-to-end-delivery-simulation--verification)
+  - [Testing with GitHub Webhook Delivery](#testing-with-github-webhook-delivery)
+  - [Unit Tests](#unit-tests)
+- [Monitoring and Alerts](#monitoring-and-alerts)
+- [Security Checklist](#security-checklist)
+- [Quick Reference](#quick-reference)
+- [See Also / Related Documentation](#see-also--related-documentation)
+- [Additional Resources](#additional-resources)
+- [Support](#support)
+
+---
+
+
 ## Executive Summary
 
 This guide explains the GitHub webhook security implementation for the Stellar Bounty Board. The system validates that webhook signatures are properly verified, preventing attackers from sending fake GitHub events.
@@ -463,6 +494,15 @@ npm run test:coverage
 | Run webhook tests | `npm test -- webhookSecretValidation.test.ts` |
 | Check logs | `tail -f logs/app.log` |
 | Verify secret is set | `echo $GITHUB_WEBHOOK_SECRET` |
+
+
+## See Also / Related Documentation
+
+- [WEBHOOK_SECRET_VALIDATION.md](./WEBHOOK_SECRET_VALIDATION.md) — Startup validation and enforcement of `GITHUB_WEBHOOK_SECRET`.
+- [SECURITY.md](./SECURITY.md) — Security policies, vulnerability disclosure procedures, and CSP configurations.
+- [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) — Pre-PR security verification checklist for new endpoints and auth changes.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contributor onboarding, local testing, and development guides.
+
 
 ## Additional Resources
 
