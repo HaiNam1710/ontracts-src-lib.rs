@@ -1,5 +1,31 @@
 # GitHub Webhook Secret Validation Implementation
 
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Problem Statement](#problem-statement)
+- [Solution Architecture](#solution-architecture)
+  - [1. Validation Module](#1-validation-module)
+  - [2. Startup Integration](#2-startup-integration)
+  - [Complete Worked Example: Validating Webhook Secret at Startup](#complete-worked-example-validating-webhook-secret-at-startup)
+  - [3. Environment Configuration](#3-environment-configuration)
+- [Error Messages](#error-messages)
+  - [Production Error (when secret is missing)](#production-error-when-secret-is-missing)
+  - [Development Warning (when secret is missing)](#development-warning-when-secret-is-missing)
+- [Integration with Webhook Verification](#integration-with-webhook-verification)
+- [Testing](#testing)
+- [Deployment Checklist](#deployment-checklist)
+- [Security Considerations](#security-considerations)
+- [Troubleshooting](#troubleshooting)
+- [Files Modified](#files-modified)
+- [Acceptance Criteria Met](#acceptance-criteria-met)
+- [See Also / Related Documentation](#see-also--related-documentation)
+- [References](#references)
+
+---
+
+
 ## Overview
 
 This document describes the implementation of startup validation for the `GITHUB_WEBHOOK_SECRET` environment variable, addressing security issue #346. The validation ensures that webhook signatures are properly verified, preventing attackers from sending fake GitHub events.
@@ -303,6 +329,15 @@ Tests  13 passed (13)
 - ✅ Error messages are clear and actionable
 - ✅ Validation runs before routes/servers are initialized
 - ✅ Integrates seamlessly with existing webhook verification logic
+
+
+## See Also / Related Documentation
+
+- [WEBHOOK_SECURITY_GUIDE.md](./WEBHOOK_SECURITY_GUIDE.md) — Comprehensive guide on GitHub webhook signatures, security architecture, and end-to-end simulation.
+- [SECURITY.md](./SECURITY.md) — Main repository security policy and vulnerability disclosure procedures.
+- [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) — Pre-PR security verification checklist for new routes, secrets, and auth changes.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Development workflow, testing standards, and pull request procedures.
+
 
 ## References
 
