@@ -169,7 +169,42 @@ Routes:
     - `400 Bad Request` — invalid query parameters, invalid date strings, or invalid Stellar public keys.
     - `304 Not Modified` — returned when `If-None-Match` header matches resource ETag.
     - `429 Too Many Requests` — rate limit exceeded.
-- `POST /api/bounties`
+- `POST /api/bounties` — create and fund a new bounty
+  - **Request Body**:
+    ```json
+    {
+      "repo": "owner/repo",
+      "issueNumber": 42,
+      "title": "Fix login redirect bug",
+      "description": "Detailed task description",
+      "amount": "1000000000",
+      "token": "C...",
+      "deadline": 1750000000,
+      "maintainer": "G...",
+      "template": "standard"
+    }
+    ```
+  - **Response 201 Created**:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "title": "Fix login redirect bug",
+        "description": "Detailed task description",
+        "amount": "1000000000",
+        "token": "C...",
+        "status": "open",
+        "maintainer": "G...",
+        "contributor": null,
+        "deadline": 1750000000,
+        "createdAt": 1740000000
+      }
+    }
+    ```
+  - **Error Responses**:
+    - `400 Bad Request` — invalid request payload (`INVALID_BODY`) or invalid amount.
+    - `401 Unauthorized` — missing or invalid Stellar signature authorization header.
+    - `429 Too Many Requests` — rate limit exceeded.
 - `POST /api/bounties/:id/reserve` — reserve an open bounty
   - **Request Body**:
     ```json
