@@ -449,6 +449,55 @@ npm run dev
 # [INFO] server_listen { port: 3001 }
 ```
 
+
+### Example 5: Complete Worked Example — Local Secret Generation and Rejection Verification
+
+Here is a full end-to-end worked example showing secret generation, launching the backend server, and executing automated verification using curl:
+
+1. **Generate a high-entropy secret and launch the server in production mode:**
+   ```bash
+   export GITHUB_WEBHOOK_SECRET=$(openssl rand -hex 20)
+   export NODE_ENV=production
+   export PORT=3001
+   npm start
+   ```
+   *Expected output:*
+   ```text
+   {"level":"info","event":"startup_validation_passed","environment":"production","timestamp":"2026-09-28T02:30:00.000Z"}
+   {"level":"info","event":"server_listen","port":3001,"timestamp":"2026-09-28T02:30:00.150Z"}
+   ```
+
+2. **Send a verified event with valid HMAC-SHA256 signature:**
+   ```bash
+   PAYLOAD='{"action":"opened","pull_request":{"number":101,"title":"feat: add escrow claim"}}'
+   SIGNATURE=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$GITHUB_WEBHOOK_SECRET" | awk '{print $2}')
+   curl -i -X POST http://localhost:3001/api/webhooks/github \
+     -H "Content-Type: application/json" \
+     -H "x-hub-signature-256: sha256=$SIGNATURE" \
+     -d "$PAYLOAD"
+   ```
+   *Expected output:*
+   ```http
+   HTTP/1.1 202 Accepted
+   Content-Type: application/json; charset=utf-8
+
+   {"data":{"authenticated":true,"provider":"github","received":true}}
+   ```
+
+3. **Send an invalid request without signature header (Tampering check):**
+   ```bash
+   curl -i -X POST http://localhost:3001/api/webhooks/github \
+     -H "Content-Type: application/json" \
+     -d "$PAYLOAD"
+   ```
+   *Expected output:*
+   ```http
+   HTTP/1.1 401 Unauthorized
+   Content-Type: application/json; charset=utf-8
+
+   {"error":"Missing GitHub webhook signature in x-hub-signature-256."}
+   ```
+
 ### Example 3: Testing Webhook Signature
 
 ```bash
