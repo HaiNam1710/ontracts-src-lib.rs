@@ -789,6 +789,38 @@ impl StellarBountyBoardContract {
         );
     }
 
+    /// Raises a dispute on a submitted bounty, transitioning its status to `Disputed`.
+    ///
+    /// This function is part of the public contract ABI. A contributor who has submitted
+    /// work for a bounty can raise a dispute if there is a conflict or disagreement with
+    /// the maintainer before the deadline passes.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty being disputed.
+    /// * `arbiter` - Address of the arbiter handling dispute resolution. Must match
+    ///   the contract's currently configured arbiter stored in persistent storage.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from the bounty's assigned `contributor` (`contributor.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (via `read_bounty`).
+    /// * [`ContractError::BountyExpired`] - If the current ledger timestamp is past the bounty's `deadline` (`env.ledger().timestamp() > bounty.deadline`).
+    /// * [`ContractError::MissingContributor`] - If the bounty does not have an assigned contributor (`bounty.contributor` is `None`).
+    /// * [`ContractError::BountyMustBeSubmitted`] - If the bounty's current status is not [`BountyStatus::Submitted`].
+    /// * [`ContractError::ArbiterNotSet`] - If no arbiter has been configured in persistent storage (`DataKey::Arbiter`).
+    /// * [`ContractError::NotArbiter`] - If the provided `arbiter` argument does not match the stored arbiter address.
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the existing bounty state via `read_bounty`.
+    ///   - [`DataKey::Arbiter`] - Persistent storage lookup to verify the arbiter address.
+    /// * **Write**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Updates `bounty.status` to [`BountyStatus::Disputed`] and records `bounty.dispute_raised_at` timestamp.
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Dispt"))` with [`BountyDisputed`] payload.
     pub fn dispute_bounty(env: Env, bounty_id: u64, arbiter: Address) {
         let mut bounty = read_bounty(&env, bounty_id);
 
