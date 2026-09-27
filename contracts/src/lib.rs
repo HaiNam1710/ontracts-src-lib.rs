@@ -684,6 +684,32 @@ impl StellarBountyBoardContract {
         );
     }
 
+    /// Submits work for a reserved bounty, transitioning its status to `Submitted`.
+    ///
+    /// This function is part of the public contract ABI. The assigned contributor notifies
+    /// the contract and maintainer that the deliverables for the bounty have been completed.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty being submitted.
+    /// * `contributor` - Address of the assigned contributor submitting the work.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from `contributor` (`contributor.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (via `read_bounty`).
+    /// * [`ContractError::BountyMustBeReserved`] - If the bounty's status is not [`BountyStatus::Reserved`] (also triggered if `expire_if_needed` transitions an expired bounty to [`BountyStatus::Expired`]).
+    /// * [`ContractError::ContributorMismatch`] - If `contributor` does not match the bounty's assigned worker (`bounty.contributor != Some(contributor)`).
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the existing bounty state via `read_bounty`.
+    /// * **Write**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Updates `bounty.status` to [`BountyStatus::Submitted`].
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Submit"))` with [`BountySubmitted`] payload.
     pub fn submit_bounty(env: Env, bounty_id: u64, contributor: Address) {
         contributor.require_auth();
         let mut bounty = read_bounty(&env, bounty_id);
