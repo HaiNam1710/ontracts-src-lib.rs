@@ -282,7 +282,25 @@ Routes:
     - `409 Conflict` — bounty is not in submitted state or maintainer mismatch.
     - `429 Too Many Requests` — rate limit exceeded.
 - `POST /api/bounties/:id/refund`
-- `GET /api/open-issues`
+- `GET /api/open-issues` — fetch available candidate GitHub issues for bounties
+  - **Request**: No request body or query parameters required.
+  - **Response 200 OK**: Cached for 10 minutes (`Cache-Control: max-age=600`).
+    ```json
+    {
+      "data": [
+        {
+          "id": "GH-42",
+          "title": "Fix login redirect bug",
+          "labels": ["bug", "good first issue"],
+          "summary": "First paragraph summary of the GitHub issue body.",
+          "impact": "starter"
+        }
+      ]
+    }
+    ```
+  - **Error Responses**:
+    - `502 Bad Gateway` — upstream GitHub API unreachable or returned failure.
+    - `429 Too Many Requests` — rate limit exceeded.
 
 ## Run Locally
 
