@@ -694,6 +694,34 @@ impl StellarBountyBoardContract {
         );
     }
 
+    /// Refunds the entire bounty amount back to the creator (maintainer) if expired and uncompleted.
+    ///
+    /// This function is part of the public contract ABI. A maintainer can reclaim their deposited
+    /// tokens once the bounty deadline has passed, provided the bounty was not already released or refunded.
+    /// Full original amount is returned without any protocol fees deducted.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty to refund.
+    /// * `maintainer` - Address of the bounty creator requesting the refund.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from the specified `maintainer` (`maintainer.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (via `read_bounty`).
+    /// * [`ContractError::MaintainerMismatch`] - If `maintainer` does not match the bounty's registered creator (`bounty.maintainer != maintainer`).
+    /// * [`ContractError::BountyAlreadyFinalized`] - If the bounty status is already [`BountyStatus::Released`] or [`BountyStatus::Refunded`].
+    /// * [`ContractError::BountyNotExpiredYet`] - If the current ledger timestamp is less than or equal to `bounty.deadline` (and `bounty.deadline != 0`).
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the existing bounty state via `read_bounty`.
+    /// * **Write**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Updates `bounty.status` to [`BountyStatus::Refunded`] via `write_bounty`.
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Refund"))` with [`BountyRefunded`] payload.
     pub fn refund_bounty(env: Env, bounty_id: u64, maintainer: Address) {
         maintainer.require_auth();
         let mut bounty = read_bounty(&env, bounty_id);
