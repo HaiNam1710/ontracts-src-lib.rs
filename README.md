@@ -133,7 +133,31 @@ Routes:
 - `GET /api/health/deep` — dependency-aware readiness check (returns 503 if any component is down)
 - `GET /api/bounties`
 - `POST /api/bounties`
-- `POST /api/bounties/:id/reserve`
+- `POST /api/bounties/:id/reserve` — reserve an open bounty
+  - **Request Body**:
+    ```json
+    {
+      "contributor": "G...",
+      "expectedVersion": 1
+    }
+    ```
+  - **Response 200 OK**:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "status": "reserved",
+        "contributor": "G...",
+        "reservedAt": "2026-09-27T16:00:00.000Z",
+        "version": 2
+      }
+    }
+    ```
+  - **Error Responses**:
+    - `400 Bad Request` — invalid request payload (`INVALID_BODY`).
+    - `404 Not Found` — bounty ID not found (`BOUNTY_NOT_FOUND`).
+    - `409 Conflict` — bounty is already reserved/released, or version mismatch.
+    - `429 Too Many Requests` — rate limit exceeded.
 - `POST /api/bounties/:id/submit` — submit work for a reserved bounty
   - **Request Body**:
     ```json
