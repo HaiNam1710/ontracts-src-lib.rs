@@ -160,7 +160,31 @@ Routes:
     - `404 Not Found` — bounty ID not found (`BOUNTY_NOT_FOUND`).
     - `409 Conflict` — bounty is not in reserved state or contributor mismatch.
     - `429 Too Many Requests` — rate limit exceeded.
-- `POST /api/bounties/:id/release`
+- `POST /api/bounties/:id/release` — release escrowed payout to contributor
+  - **Request Body**:
+    ```json
+    {
+      "maintainer": "G...",
+      "transactionHash": "0000000000000000000000000000000000000000000000000000000000000000"
+    }
+    ```
+  - **Response 200 OK**:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "status": "released",
+        "maintainer": "G...",
+        "releasedAt": "2026-09-27T15:35:00.000Z"
+      }
+    }
+    ```
+  - **Error Responses**:
+    - `400 Bad Request` — invalid request payload (`INVALID_BODY`).
+    - `401 Unauthorized` — missing or invalid Stellar signature headers.
+    - `404 Not Found` — bounty ID not found (`BOUNTY_NOT_FOUND`).
+    - `409 Conflict` — bounty is not in submitted state or maintainer mismatch.
+    - `429 Too Many Requests` — rate limit exceeded.
 - `POST /api/bounties/:id/refund`
 - `GET /api/open-issues`
 
