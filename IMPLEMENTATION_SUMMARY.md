@@ -267,6 +267,53 @@ npm test -- webhookSecretValidation.test.ts
 npm run test:coverage
 ```
 
+### Worked Example: Running Webhook Secret Validation Tests Locally
+
+This worked example demonstrates how to execute the test suite for `validateGitHubWebhookSecret` and verify both unit tests and coverage metrics:
+
+1. **Run the specific test suite:**
+   ```bash
+   cd backend
+   npm test -- webhookSecretValidation.test.ts
+   ```
+   *Expected output:*
+   ```text
+    ✓ test/webhookSecretValidation.test.ts (13 tests) 32ms
+      ✓ validateGitHubWebhookSecret > Production environment > should throw error when GITHUB_WEBHOOK_SECRET is missing
+      ✓ validateGitHubWebhookSecret > Production environment > should throw error when GITHUB_WEBHOOK_SECRET is empty string
+      ✓ validateGitHubWebhookSecret > Production environment > should throw error when GITHUB_WEBHOOK_SECRET is only whitespace
+      ✓ validateGitHubWebhookSecret > Production environment > should not throw when GITHUB_WEBHOOK_SECRET is set
+      ✓ validateGitHubWebhookSecret > Production environment > should include actionable guidance in error message
+      ✓ validateGitHubWebhookSecret > Development environment > should not throw when GITHUB_WEBHOOK_SECRET is missing
+      ✓ validateGitHubWebhookSecret > Development environment > should not throw when GITHUB_WEBHOOK_SECRET is empty string
+      ✓ validateGitHubWebhookSecret > Development environment > should not throw when GITHUB_WEBHOOK_SECRET is only whitespace
+      ✓ validateGitHubWebhookSecret > Development environment > should not throw when GITHUB_WEBHOOK_SECRET is set
+      ✓ validateGitHubWebhookSecret > Default environment > should treat missing NODE_ENV as development and not throw
+      ✓ validateGitHubWebhookSecret > Edge cases > should handle NODE_ENV with different casings
+      ✓ validateGitHubWebhookSecret > Edge cases > should accept secrets with special characters
+      ✓ validateGitHubWebhookSecret > Edge cases > should accept very long secrets
+
+   Test Files  1 passed (1)
+   Tests       13 passed (13)
+   Duration    450ms
+   ```
+
+2. **Verify coverage metrics:**
+   ```bash
+   npm run test:coverage -- webhookSecretValidation.test.ts
+   ```
+   *Expected output:*
+   ```text
+   -------------------------------|---------|----------|---------|---------|-------------------
+   File                           | % Stmts | % Branch | % Funcs | % Lines | Uncovered Line #s 
+   -------------------------------|---------|----------|---------|---------|-------------------
+   validation/                    |     100 |      100 |     100 |     100 |                   
+     webhookSecretValidation.ts   |     100 |      100 |     100 |     100 |                   
+   -------------------------------|---------|----------|---------|---------|-------------------
+   All files                      |     100 |      100 |     100 |     100 |                   
+   ```
+
+
 ## Acceptance Criteria
 
 - ✅ Production startup fails with clear error if secret missing
