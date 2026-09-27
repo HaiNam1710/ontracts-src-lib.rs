@@ -2,6 +2,37 @@
 
 This project is intentionally scoped as an MVP with obvious upgrade paths.
 
+
+## Table of Contents
+
+- [Run locally](#run-locally)
+- [Conventional Commits](#conventional-commits)
+  - [Commit Format](#commit-format)
+  - [Commit Types](#commit-types)
+  - [Examples](#examples)
+- [Pull Request Checklist](#pull-request-checklist)
+  - [Complete Worked Example: From Branch Creation to Verified Pull Request](#complete-worked-example-from-branch-creation-to-verified-pull-request)
+- [Testing](#testing)
+  - [Running Tests](#running-tests)
+  - [Rate Limiting in Test Environment](#rate-limiting-in-test-environment)
+  - [Test Types](#test-types)
+  - [Writing Test Fixtures](#writing-test-fixtures)
+  - [Test Patterns](#test-patterns)
+  - [Testing expected failures](#testing-expected-failures)
+  - [Running the contract test suite](#running-the-contract-test-suite)
+- [Pre-Commit Hooks](#pre-commit-hooks)
+  - [What Gets Checked](#what-gets-checked)
+  - [Setup](#setup)
+  - [Platform-Specific Setup](#platform-specific-setup)
+  - [Bypassing Hooks (Not Recommended)](#bypassing-hooks-not-recommended)
+  - [Troubleshooting](#troubleshooting)
+  - [Configuration Files](#configuration-files)
+- [Getting Help](#getting-help)
+- [See Also / Related Documentation](#see-also--related-documentation)
+
+---
+
+
 ## Run locally
 
 1. Clone the repo and install dependencies:
@@ -611,5 +642,16 @@ chmod +x .husky/pre-commit
 - **Can't figure something out?** Open a Discussion or comment on the issue you're working on
 
 We value quality contributions and clear communication. If this guide is missing something, a PR improving it is one of the most valuable contributions you can make.
+
+
+## See Also / Related Documentation
+
+- [SECURITY.md](./SECURITY.md) — Security policies, vulnerability disclosure, and arbiter assumptions.
+- [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) — Security checklist for pull request reviews.
+- [WEBHOOK_SECURITY_GUIDE.md](./WEBHOOK_SECURITY_GUIDE.md) — GitHub webhook HMAC signature verification guide.
+- [WEBHOOK_SECRET_VALIDATION.md](./WEBHOOK_SECRET_VALIDATION.md) — Server startup secret enforcement documentation.
+- [IMPLEMENTATION_SUMMARY.md](./IMPLEMENTATION_SUMMARY.md) — Architectural summaries and testing procedures.
+- [CODE_EXAMPLES.md](./CODE_EXAMPLES.md) — Code reference and end-to-end usage examples.
+
 
 Happy coding! 🚀
