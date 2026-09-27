@@ -708,6 +708,36 @@ impl StellarBountyBoardContract {
         );
     }
 
+    /// Releases an escrowed bounty payout to the assigned contributor after deducting protocol fees.
+    ///
+    /// This function is part of the public contract ABI. The bounty maintainer approves
+    /// the submitted work, triggering token transfers from contract escrow: the net payout
+    /// goes to the contributor, and any protocol fee is transferred to the treasury address.
+    ///
+    /// # Parameters
+    /// * `env` - The Soroban contract environment.
+    /// * `bounty_id` - Unique identifier (`u64`) of the bounty being released.
+    /// * `maintainer` - Address of the bounty creator/maintainer approving the release.
+    ///
+    /// # Authorisation
+    /// * Requires authorization from `maintainer` (`maintainer.require_auth()`).
+    ///
+    /// # Errors & Panic Paths
+    /// * [`ContractError::BountyNotFound`] - If no bounty exists with the given `bounty_id` (via `read_bounty`).
+    /// * [`ContractError::MaintainerMismatch`] - If the caller `maintainer` does not match the bounty's registered creator (`bounty.maintainer != maintainer`).
+    /// * [`ContractError::BountyMustBeSubmitted`] - If the bounty's current status is not [`BountyStatus::Submitted`].
+    /// * Panics via `unwrap()` if the bounty lacks an assigned contributor (`bounty.contributor` is `None`).
+    /// * Contract token client panics if token transfers to contributor or treasury fail.
+    ///
+    /// # Storage
+    /// * **Read**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Reads the existing bounty state via `read_bounty`.
+    ///   - [`DataKey::Treasury`] - Persistent storage lookup to obtain the protocol treasury address if fees apply.
+    /// * **Write**:
+    ///   - [`DataKey::Bounty(bounty_id)`] - Updates `bounty.status` to [`BountyStatus::Released`] and records `bounty.released_at` timestamp.
+    ///
+    /// # Events
+    /// * Emits `(symbol_short!("Bounty"), symbol_short!("Rel"))` with [`BountyReleased`] payload.
     pub fn release_bounty(env: Env, bounty_id: u64, maintainer: Address) {
         maintainer.require_auth();
         let mut bounty = read_bounty(&env, bounty_id);
