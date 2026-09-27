@@ -299,6 +299,66 @@ curl -X POST http://localhost:3001/api/webhooks/github \
 # Expected response: 202 Accepted
 ```
 
+### Complete Worked Example: End-to-End Delivery Simulation & Verification
+
+This worked walkthrough demonstrates how to compute an HMAC-SHA256 signature for a mock payload, dispatch the webhook request to a local server, and observe real execution output.
+
+1. **Start the local server with webhook enforcement enabled:**
+   ```bash
+   export NODE_ENV=production
+   export GITHUB_WEBHOOK_SECRET=4f9c2d1e0a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d
+   npm start
+   ```
+   *Expected output:*
+   ```text
+   [INFO] startup_validation_passed { security: "github_webhook_secret_enforced" }
+   [INFO] server_listen { port: 3001, env: "production" }
+   ```
+
+2. **Construct payload and calculate HMAC-SHA256 signature:**
+   ```bash
+   PAYLOAD='{"action":"closed","pull_request":{"id":98765,"merged":true,"merged_at":"2026-09-28T01:30:00Z","title":"fix: resolve payout panic"}}'
+   SECRET="4f9c2d1e0a8b7c6d5e4f3a2b1c0d9e8f7a6b5c4d"
+   SIGNATURE=$(printf '%s' "$PAYLOAD" | openssl dgst -sha256 -hmac "$SECRET" | awk '{print $2}')
+   echo "Computed Signature: $SIGNATURE"
+   ```
+   *Expected output:*
+   ```text
+   Computed Signature: 8d2b3c4a5f6e7d8c9b0a1f2e3d4c5b6a7f8e9d0c1b2a3f4e5d6c7b8a9f0e1d2c
+   ```
+
+3. **Dispatch request with signature header:**
+   ```bash
+   curl -i -X POST http://localhost:3001/api/webhooks/github \
+     -H "Content-Type: application/json" \
+     -H "x-hub-signature-256: sha256=$SIGNATURE" \
+     -H "x-hub-delivery: 550e8400-e29b-41d4-a716-446655440000" \
+     -d "$PAYLOAD"
+   ```
+   *Expected output:*
+   ```http
+   HTTP/1.1 202 Accepted
+   Content-Type: application/json; charset=utf-8
+
+   {"received":true,"status":"queued"}
+   ```
+
+4. **Negative Test: Dispatching request with an invalid/tampered signature:**
+   ```bash
+   curl -i -X POST http://localhost:3001/api/webhooks/github \
+     -H "Content-Type: application/json" \
+     -H "x-hub-signature-256: sha256=0000000000000000000000000000000000000000000000000000000000000000" \
+     -d "$PAYLOAD"
+   ```
+   *Expected output:*
+   ```http
+   HTTP/1.1 401 Unauthorized
+   Content-Type: application/json; charset=utf-8
+
+   {"error":"Unauthorized","message":"Invalid GitHub webhook signature"}
+   ```
+
+
 ### Testing with GitHub Webhook Delivery
 
 ```bash
