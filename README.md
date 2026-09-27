@@ -134,7 +134,32 @@ Routes:
 - `GET /api/bounties`
 - `POST /api/bounties`
 - `POST /api/bounties/:id/reserve`
-- `POST /api/bounties/:id/submit`
+- `POST /api/bounties/:id/submit` — submit work for a reserved bounty
+  - **Request Body**:
+    ```json
+    {
+      "contributor": "G...",
+      "submissionUrl": "https://github.com/owner/repo/pull/123",
+      "notes": "Optional notes on implementation"
+    }
+    ```
+  - **Response 200 OK**:
+    ```json
+    {
+      "data": {
+        "id": 1,
+        "status": "submitted",
+        "contributor": "G...",
+        "submissionUrl": "https://github.com/owner/repo/pull/123",
+        "notes": "Optional notes on implementation"
+      }
+    }
+    ```
+  - **Error Responses**:
+    - `400 Bad Request` — invalid request payload or validation failure (`INVALID_BODY`).
+    - `404 Not Found` — bounty ID not found (`BOUNTY_NOT_FOUND`).
+    - `409 Conflict` — bounty is not in reserved state or contributor mismatch.
+    - `429 Too Many Requests` — rate limit exceeded.
 - `POST /api/bounties/:id/release`
 - `POST /api/bounties/:id/refund`
 - `GET /api/open-issues`
