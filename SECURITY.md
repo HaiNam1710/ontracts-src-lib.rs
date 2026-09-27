@@ -1,5 +1,28 @@
 # Security Policy
 
+
+## Table of Contents
+
+- [Content Security Policy (CSP)](#content-security-policy-csp)
+  - [Current policy](#current-policy)
+  - [Report-only mode](#report-only-mode)
+  - [Updating the policy](#updating-the-policy)
+  - [Worked Example: Verifying CSP Report-Only Mode Locally](#worked-example-verifying-csp-report-only-mode-locally)
+- [Supported Versions](#supported-versions)
+- [Reporting a Vulnerability](#reporting-a-vulnerability)
+- [Responsible Disclosure Timeline](#responsible-disclosure-timeline)
+- [Our Commitments](#our-commitments)
+- [Credits](#credits)
+- [Logging best practices](#logging-best-practices)
+- [Authentication Architecture](#authentication-architecture)
+- [Contract Security Review: Arbiter Trust Assumptions](#contract-security-review-arbiter-trust-assumptions)
+- [Automated Security Analysis](#automated-security-analysis)
+- [Scope](#scope)
+- [See Also / Related Documentation](#see-also--related-documentation)
+
+---
+
+
 ## Content Security Policy (CSP)
 
 The frontend build injects a `Content-Security-Policy-Report-Only` meta tag via `frontend/vite.config.ts`.
@@ -407,5 +430,16 @@ The following are **out of scope**:
 - Issues in forks or unofficial deployments
 
 ---
+
+
+---
+
+## See Also / Related Documentation
+
+- [SECURITY_CHECKLIST.md](./SECURITY_CHECKLIST.md) — Pre-PR security verification checklist covering input validation, auth, and secret rotation.
+- [WEBHOOK_SECURITY_GUIDE.md](./WEBHOOK_SECURITY_GUIDE.md) — Detailed guide on GitHub webhook HMAC-SHA256 signature verification.
+- [WEBHOOK_SECRET_VALIDATION.md](./WEBHOOK_SECRET_VALIDATION.md) — Server startup validation and enforcement of webhook secrets.
+- [RUNBOOK.md](./RUNBOOK.md) — Operational runbooks including incident response procedures for compromised arbiter keys.
+- [CONTRIBUTING.md](./CONTRIBUTING.md) — Contribution guidelines and development workflow.
 
 _Last updated: 2026-05-28_
