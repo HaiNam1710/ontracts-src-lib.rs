@@ -14,6 +14,7 @@ This document describes the system architecture of Stellar Bounty Board, includi
   - [BountyStatus State Machine (Mermaid)](#bountystatus-state-machine-mermaid)
 - [Interaction Sequence Diagrams](#interaction-sequence-diagrams)
   - [0. Maintainer-Raised Dispute Flow](#0-maintainer-raised-dispute-flow)
+  - [Maintainer Wallet Unreachability & Contributor Dispute Escalation](#maintainer-wallet-unreachability--contributor-dispute-escalation)
   - [1. Create Bounty](#1-create-bounty)
   - [2. Reserve Bounty](#2-reserve-bounty)
   - [3. Submit Work](#3-submit-work)
@@ -359,6 +360,71 @@ sequenceDiagram
     Frontend-->>Maintainer: Final status displayed
     Frontend-->>Contributor: Final status displayed
 ```
+
+
+### Maintainer Wallet Unreachability & Contributor Dispute Escalation
+
+#### Problem Overview
+
+In standard lifecycle operation, the maintainer is responsible for reviewing submissions and calling `release_bounty` (which requires `maintainer.require_auth()`) or `refund_bounty`. However, real-world failure modes include:
+1. **Wallet Key Compromise or Loss**: The maintainer loses access to their Stellar secret key or hardware wallet.
+2. **Project Abandonment / Unresponsiveness**: The maintainer stops reviewing submissions without officially closing the repository or bounty.
+3. **Personnel Turnover**: The original maintainer leaves an organization before signing release transactions.
+
+Under these conditions, a contributor who has fulfilled all acceptance criteria risks having their submission and escrowed funds permanently locked in `BountyStatus::Submitted` without recourse.
+
+#### Contract-Level Reality vs Off-Chain Flow
+
+In the Soroban smart contract (`contracts/src/lib.rs`):
+- `release_bounty`: Strictly mandates `maintainer.require_auth()`. A lost maintainer key makes calling `release_bounty` impossible.
+- `dispute_bounty`: Specifically authorizes `contributor.require_auth()` for bounties in `BountyStatus::Submitted` prior to `bounty.deadline`.
+- `resolve_dispute`: Authorized exclusively by the designated `arbiter`. The arbiter can rule with `release = true` (releasing funds to the contributor) or `release = false` (refunding to the maintainer address).
+
+#### Sequence Flow: Contributor-Initiated Dispute After Inaction Timeout
+
+When a submission sits unreviewed past the designated review timeout window (defaulting to 14 days), the contributor is entitled to escalate directly to the on-chain Arbiter:
+
+```mermaid
+sequenceDiagram
+    actor Contributor
+    actor Maintainer (Unresponsive / Lost Key)
+    actor Arbiter
+    participant Frontend
+    participant Backend
+    participant Contract (Soroban)
+
+    Contributor->>Contract: submit_bounty(bounty_id, contributor)
+    Contract-->>Backend: Status: Submitted (dispute timer begins)
+    Note over Contributor,Maintainer: Maintainer wallet is unresponsive or unreachable
+
+    rect rgb(240, 240, 240)
+        Note over Contributor,Arbiter: Review Window Expires (e.g. 14 Days)
+        Contributor->>Frontend: Trigger "Escalate to Arbiter (Maintainer Unresponsive)"
+        Frontend->>Contract: dispute_bounty(bounty_id, arbiter) [contributor auth]
+        Contract-->>Contract: status = Disputed, dispute_raised_at = now
+    end
+
+    Contract-->>Arbiter: Event: BountyDisputed(bounty_id, contributor, arbiter)
+    Arbiter->>Backend: Inspects PR proof-of-work & Git commit verification
+    
+    alt Work verified & passes criteria
+        Arbiter->>Contract: resolve_dispute(bounty_id, release: true)
+        Contract-->>Contributor: Escrowed funds transferred to Contributor
+        Contract-->>Contract: status = Released
+    else Work incomplete or non-functional
+        Arbiter->>Contract: resolve_dispute(bounty_id, release: false)
+        Contract-->>Maintainer: Escrowed funds returned to Maintainer address
+        Contract-->>Contract: status = Refunded
+    end
+```
+
+#### Architecture Decision: Contributor-Initiated Dispute Policy
+
+1. **Decision**: Contributor-initiated dispute escalation after an unactioned review timeout is **officially adopted and required** as part of the system lifecycle.
+2. **Timeout Window**: A submission must sit in `BountyStatus::Submitted` without maintainer action for at least `SUBMISSION_INACTION_TIMEOUT` (14 days) before contributor dispute escalation is unlocked on the frontend/API.
+3. **Arbiter Jurisdiction**: The Arbiter acts as the ultimate fail-safe fiduciary. Even if the maintainer never recovers their wallet, the Arbiter's independent signature via `resolve_dispute` guarantees that contributors who deliver working code are paid out from on-chain escrow.
+4. **Deadline Expiration Boundary**: If a bounty reaches its deadline before submission or dispute, it transitions to `BountyStatus::Expired` where only refunds can be processed. Contributors are advised to submit well ahead of deadline boundaries.
+
 
 ### 1. Create Bounty
 
